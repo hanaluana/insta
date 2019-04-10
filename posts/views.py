@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import PostForm
 from .models import Post
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 
@@ -10,13 +11,29 @@ def create(request):
         form =PostForm(request.POST)
         if form.is_valid():
             form.save()
-        return redirect('posts:create')
+        return redirect('posts:list')
     else:
         # 새로 post 작성하는 form 페이지 보여줌
         form = PostForm()
         return render(request, 'posts/create.html', {'form':form})
         
-def index(request):
+def list(request):
     posts = Post.objects.all()
     return render(request, 'posts/list.html', {'posts':posts})
-        
+
+@require_POST
+def delete(request,id):
+    post = Post.objects.get(pk=id)
+    post.delete()
+    return redirect('posts:list')
+
+def update(request, id):
+    post= Post.objects.get(pk=id)
+    if request.method=="POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+        return redirect('posts:list')
+    else:
+        form = PostForm(instance = post)
+        return render(request, 'posts/update.html', {'form':form})
