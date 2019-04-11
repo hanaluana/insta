@@ -3,7 +3,7 @@
 {% block body %}
   <div class="row justify-content-center">
     {% for post in posts %}
-      <div class="card col-3" style="width: 50rem;">
+      <div class="card col-3 mr-2 mt-3" style="width: 50rem;">
         <img src="https://picsum.photos/200/200/?random" class="card-img-top" alt="...">
         <div class="card-body">
           <p class="card-text">{{post.content}}</p>
@@ -11,7 +11,7 @@
             {% csrf_token %}
             <button class="btn btn-danger">삭제</button>
           </form>
-          <a href="{% url 'posts:update' post.id %}"><button class="btn btn-success">수정</button></a>
+          <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
         </div>
       </div>
     {% endfor %}
