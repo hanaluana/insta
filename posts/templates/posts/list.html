@@ -4,14 +4,21 @@
   <div class="row justify-content-center">
     {% for post in posts %}
       <div class="card col-3 mr-2 mt-3" style="width: 50rem;">
-        <img src="{{post.image.url}}" class="card-img-top" alt="...">
+        <div>
+          <span><h5 class="card-header">{{post.user}}</h5></span>
+        </div>
+        <img src="{{post.image.url}}" class="card-img-top mt-2" alt="...">
         <div class="card-body">
           <p class="card-text">{{post.content}}</p>
-          <form action="{% url 'posts:delete' post.id %}" method="POST">
-            {% csrf_token %}
-            <button class="btn btn-danger">삭제</button>
-          </form>
-          <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
+          
+          <!--작성자만 수정/삭제 가능-->
+          {% if post.user == request.user %}
+            <form action="{% url 'posts:delete' post.id %}" method="POST">
+              {% csrf_token %}
+              <button class="btn btn-danger">삭제</button>
+            </form>
+            <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
+          {% endif %}
         </div>
       </div>
     {% endfor %}

@@ -25,11 +25,15 @@ def list(request):
 @require_POST
 def delete(request,id):
     post = Post.objects.get(pk=id)
+    if post.user != request.user:
+        return redirect('posts:list')
     post.delete()
     return redirect('posts:list')
 
 def update(request, id):
     post = get_object_or_404(Post, pk=id)
+    if post.user != request.user:
+        return redirect('posts:list')
     if request.method=="POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
