@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm
@@ -28,18 +28,22 @@ def logout(request):
     auth_logout(request)
     return redirect('posts:list')
 
-    
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            auth_login(request, form.instance)
-            # messages.success(request, '환영합니다! '+form.instance.username+'님')
+            user = form.save()
+            auth_login(request, user)
             return redirect('posts:list')
         else:
-            # messages.success(request, '회원가입에 실패하였습니다')
             return redirect('account:register')
     else:
         form = UserCreationForm()
         return render(request, 'accounts/register.html', {'form':form})
+        
+def people(request, username):
+    people = get_object_or_404(get_user_model(), username=username) # 모델, username=""
+    # 1. settings.AUTH_USER_MODEL (django.conf에 있음)
+    # 2. get_user_model() : 얘는 아예 객체를 return
+    # 3. User (django.contrib.auth.models에 있는 친구) : 얘는 쓰면 안 좋음
+    return render(request, 'accounts/people.html', {'people': people })
