@@ -23,15 +23,15 @@ def list(request):
     return render(request, 'posts/list.html', {'posts':posts})
 
 @require_POST
-def delete(request,id):
-    post = Post.objects.get(pk=id)
+def delete(request,post_id):
+    post = Post.objects.get(pk=post_id)
     if post.user != request.user:
         return redirect('posts:list')
     post.delete()
     return redirect('posts:list')
 
-def update(request, id):
-    post = get_object_or_404(Post, pk=id)
+def update(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
     if post.user != request.user:
         return redirect('posts:list')
     if request.method=="POST":
@@ -42,3 +42,19 @@ def update(request, id):
     else:
         form = PostForm(instance = post)
         return render(request, 'posts/update.html', {'form':form})
+        
+def like(request,post_id):
+    # 이 유저는 어떤 유저인가는 여기서 해결해준다.
+    post = get_object_or_404(Post, pk= post_id)
+    
+    # 만약 user가 접속이 되어 있고, 클릭을 할때마다 현재 like의 상태를 반대로 바꿔준다.
+    
+    # 1. 만약, user가 해당 포스트를 이미 like 했다면, like를 해재한다.
+    # 2. 아니면, like를 추가한다.
+    if request.user in post.like_users.all():
+        post.like_users.remove(request.user)
+    else:
+        post.like_users.add(request.user)
+        
+    return redirect('posts:list')
+    
