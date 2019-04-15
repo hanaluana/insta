@@ -10,15 +10,34 @@
         <img src="{{post.image.url}}" class="card-img-top mt-2" alt="...">
         <div class="card-body">
           <p class="card-text">{{post.content}}</p>
-          
-          <!--작성자만 수정/삭제 가능-->
           {% if post.user == request.user %}
-            <form action="{% url 'posts:delete' post.id %}" method="POST">
-              {% csrf_token %}
-              <button class="btn btn-danger">삭제</button>
-            </form>
-            <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
+            <div class="row">
+              <div class="col-5">
+                <form action="{% url 'posts:delete' post.id %}" method="POST">
+                  {% csrf_token %}
+                  <button class="btn btn-danger">삭제</button>
+                </form>
+              </div>
+              <div class="col-5">
+                <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
+              </div>
+            </div>
+          <!--작성자만 수정/삭제 가능--> 
           {% endif %}
+        </div>
+        <div class="card-body">
+        <!--좋아요 버튼 추가-->
+          <a href="{% url 'posts:like' post.id %}">
+          <!--해당 유저가 like를 했으면-->
+          {% if user in post.like_users.all %}
+            <i class="fas fa-heart"></i>
+          {% else %}
+            <i class="far fa-heart"></i>
+          {% endif %}
+          </a>
+          <p class="card-text">
+            {{post.like_users.count}}명이 좋아합니다.
+          </p>
         </div>
       </div>
     {% endfor %}

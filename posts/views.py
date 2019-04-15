@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PostForm
 from .models import Post
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -43,6 +44,7 @@ def update(request, post_id):
         form = PostForm(instance = post)
         return render(request, 'posts/update.html', {'form':form})
         
+@login_required
 def like(request,post_id):
     # 이 유저는 어떤 유저인가는 여기서 해결해준다.
     post = get_object_or_404(Post, pk= post_id)
