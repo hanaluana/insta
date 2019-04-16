@@ -17,6 +17,7 @@ def login(request):
         
         if form.is_valid():
             auth_login(request, form.get_user())
+            print(request.GET.get('next'))
             return redirect(request.GET.get('next') or 'posts:list') # next=가 정의 되어 있으면, 해당하는 url로, 아니면 list로...
         else:
             return redirect('accounts:login')

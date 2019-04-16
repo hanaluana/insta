@@ -9,4 +9,7 @@ urlpatterns = [
     path('<int:post_id>/delete/', views.delete, name='delete'),
     path('<int:post_id>/update/', views.update, name='update'),
     path('<int:post_id>/like/', views.like, name='like'),
+    
+    path('<int:post_id>/comment/create/', views.create_comment, name='comment'),
+    path('<int:post_id>/comment/<int:comment_id>/delete', views.delete_comment, name="delete_comment"),
 ]
