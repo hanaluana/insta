@@ -62,7 +62,10 @@ def update(request, post_id):
     if request.method=="POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            form.save()
+            post = form.save(commit=False)
+            post.user = request.user
+            post.image = request.FILES['image']
+            post.save()
         return redirect('posts:list')
     else:
         form = PostForm(instance = post)
