@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block body %}
+  <form method="POST" class="d-inline-block">
+    {% csrf_token %}
+    <p>진심으로 탈퇴 고?</p>
+    <button class="btn btn-danger" type="submit">미안하다</button>
+  </form>
+  <a class="btn btn-info" href="{% url 'posts:list' %}">아니!!</a>
+{% endblock %}

@@ -23,7 +23,7 @@ def create(request):
         return render(request, 'posts/create.html', {'form':form})
         
 @login_required
-@require_POST
+# @require_POST
 def create_comment(request, post_id):
     form = CommentForm(request.POST)
     if form.is_valid():

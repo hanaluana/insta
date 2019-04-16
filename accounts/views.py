@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from .forms import CustomUserChangeForm
 
 # Create your views here.
 # users/login 에 들어왔을 때
@@ -14,7 +16,6 @@ def login(request):
     else:
         # 로그인을 시키고 (User를 인증하고)
         form = AuthenticationForm(request, request.POST)
-        
         if form.is_valid():
             auth_login(request, form.get_user())
             print(request.GET.get('next'))
@@ -48,3 +49,39 @@ def people(request, username):
     # 2. get_user_model() : 얘는 아예 객체를 return
     # 3. User (django.contrib.auth.models에 있는 친구) : 얘는 쓰면 안 좋음
     return render(request, 'accounts/people.html', {'people': people })
+
+# 회원 정보 변경 action (편집 & 반영)
+@login_required
+def update(request):
+    if request.method == "POST":
+        user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
+        if user_change_form.is_valid():
+            user = user_change_form.save() # save()는 그 객체를 반환한다.
+        return redirect('people', user.username)
+    else:
+        user_change_form = CustomUserChangeForm(instance=request.user)
+        context = {
+            'user_change_form': user_change_form
+        }
+        return render(request, 'accounts/update.html', context)
+
+def delete(request):
+    if request.method == "POST":
+        request.user.delete()
+        return redirect('posts:list')
+    return render(request, 'accounts/delete.html')
+
+@login_required
+def password(request):
+    if request.method == "POST":
+        password_change_form = PasswordChangeForm(request.user, request.POST)
+        if password_change_form.is_valid():
+            user = password_change_form.save()
+            update_session_auth_hash(request, user)
+        return redirect('people', user.username)
+    else:
+        password_change_form = PasswordChangeForm(request.user)
+        context = {
+            'password_change_form': password_change_form
+        }
+        return render(request, 'accounts/password.html', context)

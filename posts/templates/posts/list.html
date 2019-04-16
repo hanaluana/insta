@@ -3,7 +3,7 @@
 {% block body %}
   <div class="row justify-content-center">
     {% for post in posts %}
-      <div class="card col-5 mr-2 mt-3" style="width: 50rem;">
+      <div class="card col-md-5 mr-2 mt-3 mr-auto" style="width: 50rem;">
         <div>
           <a href="{% url 'people' post.user%}" style="color: inherit;"><span><h5 class="card-header">{{post.user}}</h5></span></a>
         </div>
@@ -11,16 +11,12 @@
         <div class="card-body">
           <p class="card-text">{{post.content}}</p>
           {% if post.user == request.user %}
-            <div class="row">
-              <div class="col-3">
-                <form action="{% url 'posts:delete' post.id %}" method="POST">
-                  {% csrf_token %}
-                  <button class="btn btn-danger">삭제</button>
-                </form>
-              </div>
-              <div class="col-3" style="padding:0px">
-                <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
-              </div>
+            <div>
+              <form class="d-inline-block" action="{% url 'posts:delete' post.id %}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger">삭제</button>
+              </form>
+              <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
             </div>
           <!--작성자만 수정/삭제 가능--> 
           {% endif %}
@@ -51,7 +47,7 @@
           </form>
           
           <!--해당 글에 작성된 댓글을 모두 출력-->
-          
+          <div class="div mt-3">
             {% for comment in post.comment_set.all %}
               <div class="card-text">
                 <strong>{{comment.user.username}}</strong> {{comment.content}}
@@ -64,6 +60,7 @@
               댓글이 없습니다
               </div>
             {% endfor %}
+          </div>
         </div>
       </div>
     {% endfor %}
