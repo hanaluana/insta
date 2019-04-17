@@ -6,6 +6,7 @@
   <form method="POST" action="{% url 'accounts:update' %}">
   {% csrf_token %}
       {% bootstrap_form user_change_form %}
+      {% bootstrap_form profile_form %}
       <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 {% endblock %}

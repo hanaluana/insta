@@ -5,7 +5,8 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
-from .forms import CustomUserChangeForm
+from .forms import CustomUserChangeForm, ProfileForm
+from .models import Profile
 
 # Create your views here.
 # users/login 에 들어왔을 때
@@ -35,6 +36,7 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Profile.objects.create(user=user)
             auth_login(request, user)
             return redirect('posts:list')
         else:
@@ -54,14 +56,21 @@ def people(request, username):
 @login_required
 def update(request):
     if request.method == "POST":
-        user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
-        if user_change_form.is_valid():
-            user = user_change_form.save() # save()는 그 객체를 반환한다.
-        return redirect('people', user.username)
+        user_change_form = CustomUserChangeForm(data = request.POST, instance=request.user.profile)
+        profile_form = ProfileForm(data = request.POST, instance = request.user.profile)
+        
+        if user_change_form.is_valid() and profile_form.is_valid():
+            user_change_form.save() # save()는 그 객체를 반환한다.
+            profile_form.save()
+        return redirect('people', request.user.username)
     else:
         user_change_form = CustomUserChangeForm(instance=request.user)
+        
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        profile_form = ProfileForm(instance=profile)
         context = {
-            'user_change_form': user_change_form
+            'user_change_form': user_change_form,
+            'profile_form': profile_form,
         }
         return render(request, 'accounts/update.html', context)
 

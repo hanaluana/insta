@@ -4,7 +4,9 @@
 
   <div class="container">
     <h1>{{people.username}}</h1>
-    <p>{{people.last_name}} {{people.first_name}} </p>
+    <p><strong>{{people.last_name}} {{people.first_name}} </strong></p>
+    <p>nickname: {{people.profile.nickname}}</p>
+    <p>bio: {{people.profile.description}}</p>
     {% if user.username == people.username %}
     <a class="btn btn-warning" href="{% url 'accounts:password' %}">비밀번호 변경</a>
     <a class="btn btn-info" href="{% url 'accounts:update' %}">회원 정보 수정</a>
@@ -12,13 +14,56 @@
     {% endif %}
     <div class="row">
       {% for post in people.post_set.all %}
-      <div class="card col-md-5 mr-2 mt-3" style="width: 50rem;">
+      <div class="card col-md-5 mr-2 mt-3 mb-2" style="width: 50rem;">
         <div>
           <span><h5 class="card-header">{{post.user.username}}</h5></span>
         </div>
         <img src="{{post.image.url}}" class="card-img-top mt-2" alt="...">
         <div class="card-body">
           <p class="card-text">{{post.content}}</p>
+          {% if post.user == request.user %}
+            <div>
+              <form class="d-inline-block" action="{% url 'posts:delete' post.id %}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger">삭제</button>
+              </form>
+              <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
+            </div>
+          <!--작성자만 수정/삭제 가능--> 
+          {% endif %}
+        </div>
+        <div class="card-body" style="padding:10px">
+        <!--좋아요 버튼 추가-->
+          <a href="{% url 'posts:like' post.id %}">
+          <!--해당 유저가 like를 했으면-->
+          {% if people in post.like_users.all %}
+            <i class="fas fa-heart"></i>
+          {% else %}
+            <i class="far fa-heart"></i>
+          {% endif %}
+          </a>
+          <p class="card-text">
+            {{post.like_users.count}}명이 좋아합니다.
+          </p>
+        </div>
+        
+        <div class="card-body" style="padding:10px">
+          
+          <!--해당 글에 작성된 댓글을 모두 출력-->
+          <div class="div mt-3">
+            {% for comment in post.comment_set.all %}
+              <div class="card-text">
+                <strong>{{comment.user.username}}</strong> {{comment.content}}
+                {% if comment.user == request.user %}
+                  <a href="{% url 'posts:delete_comment' post.id comment.id %}"><button class="btn btn-danger ml-auto" style="padding:0px">X</button></a>
+                {% endif %}
+              </div>
+              {% empty %}
+              <div>
+              댓글이 없습니다
+              </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
       {% endfor %}
