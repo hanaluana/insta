@@ -3,7 +3,7 @@ from .forms import PostForm, CommentForm
 from .models import Post, Comment
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
 
 # Create your views here.
 
@@ -40,12 +40,12 @@ def delete_comment(request, post_id, comment_id):
     else:
         comment.delete()
         return redirect('posts:list')
-        
+
+@login_required
 def list(request):
     form = CommentForm()
-    posts = Post.objects.all()
-    
-    return render(request, 'posts/list.html', {'posts':posts, 'form':form})
+    posts = Post.objects.filter(Q(user_id__in=request.user.followings.all()) | Q(user_id=request.user))
+    return render(request, 'posts/list.html', {'form':form, 'posts':posts})
 
 @require_POST
 def delete(request,post_id):

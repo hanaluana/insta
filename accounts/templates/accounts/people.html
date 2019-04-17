@@ -3,14 +3,30 @@
 {% block body %}
 
   <div class="container">
-    <h1>{{people.username}}</h1>
+    <h1>{{people.username}} {% if people.username == 'haewon' %}<i class="fas fa-check-circle" style="color:#0946ae;"></i> {% endif %}
+    {% if people != request.user %}
+      {% if people in user.followings.all %}
+      <a class="btn btn-primary" href="{% url 'accounts:follow' people.id %}">unfollow </a>
+      {% else %}
+      <a class="btn btn-primary" href="{% url 'accounts:follow' people.id %}">follow </a>
+      {% endif %}
+    {% endif %}
+    </h1>
+    
     <p><strong>{{people.last_name}} {{people.first_name}} </strong></p>
     <p>nickname: {{people.profile.nickname}}</p>
     <p>bio: {{people.profile.description}}</p>
+    <div>
+    <a class="btn btn-light" style="border: 1px solid;" href="{% url 'accounts:followers' people.id %}"> {{people.followers.count}} Followers</a>
+    <a class="btn btn-light" style="border: 1px solid;" href="{% url 'accounts:followings' people.id %}">{{people.followings.count}} Followings</a>
+    </div>
+    
     {% if user.username == people.username %}
+    <div class="mt-1">
     <a class="btn btn-warning" href="{% url 'accounts:password' %}">비밀번호 변경</a>
     <a class="btn btn-info" href="{% url 'accounts:update' %}">회원 정보 수정</a>
     <a class="btn btn-danger" href="{% url 'accounts:delete' %}">회원탈퇴</a>
+    </div>
     {% endif %}
     <div class="row">
       {% for post in people.post_set.all %}

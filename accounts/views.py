@@ -5,7 +5,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
-from .forms import CustomUserChangeForm, ProfileForm
+from .forms import CustomUserChangeForm, ProfileForm, CustomUserCreationForm
 from .models import Profile
 
 # Create your views here.
@@ -33,7 +33,7 @@ def logout(request):
 
 def register(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             Profile.objects.create(user=user)
@@ -42,7 +42,7 @@ def register(request):
         else:
             return redirect('account:register')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
         return render(request, 'accounts/register.html', {'form':form})
         
 def people(request, username):
@@ -94,3 +94,24 @@ def password(request):
             'password_change_form': password_change_form
         }
         return render(request, 'accounts/password.html', context)
+        
+@login_required
+def follow(request, user_id):
+    toFollow = get_object_or_404(get_user_model(), pk=user_id)
+    if request.user in toFollow.followers.all():
+        toFollow.followers.remove(request.user)
+    else:
+        toFollow.followers.add(request.user)
+
+    return redirect('people', toFollow.username)
+
+def followers(request, user_id):
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    people = user.followers.all()
+    return render(request, 'accounts/follows.html', {'people':people})
+    
+def followings(request, user_id):
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    people = user.followings.all()
+    return render(request, 'accounts/follows.html', {'people':people})
+    

@@ -2,67 +2,67 @@
 
 {% block body %}
   <div class="row justify-content-center">
-    {% for post in posts %}
-      <div class="card col-md-5 mr-2 mt-3 mr-auto mb-2" style="width: 50rem;">
-        <div>
-          <a href="{% url 'people' post.user%}" style="color: inherit;"><span><h5 class="card-header">{{post.user}}</h5></span></a>
-        </div>
-        <img src="{{post.image.url}}" class="card-img-top mt-2" alt="...">
-        <div class="card-body">
-          <p class="card-text">{{post.content}}</p>
-          {% if post.user == request.user %}
-            <div>
-              <form class="d-inline-block" action="{% url 'posts:delete' post.id %}" method="POST">
-                {% csrf_token %}
-                <button class="btn btn-danger">삭제</button>
-              </form>
-              <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
-            </div>
-          <!--작성자만 수정/삭제 가능--> 
-          {% endif %}
-        </div>
-        <div class="card-body" style="padding:10px">
-        <!--좋아요 버튼 추가-->
-          <a href="{% url 'posts:like' post.id %}">
-          <!--해당 유저가 like를 했으면-->
-          {% if user in post.like_users.all %}
-            <i class="fas fa-heart"></i>
-          {% else %}
-            <i class="far fa-heart"></i>
-          {% endif %}
-          </a>
-          <p class="card-text">
-            {{post.like_users.count}}명이 좋아합니다.
-          </p>
-        </div>
-        
-        <div class="card-body" style="padding:10px">
-          <!--Comment에 대한 ModelForm-->
-          {% load bootstrap4 %}
-          <form method="POST" action="{%url 'posts:comment' post.id %}">
-            <!--모델 폼-->
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary">댓글쓰기</button>
-          </form>
-          
-          <!--해당 글에 작성된 댓글을 모두 출력-->
-          <div class="div mt-3">
-            {% for comment in post.comment_set.all %}
-              <div class="card-text">
-                <strong>{{comment.user.username}}</strong> {{comment.content}}
-                {% if comment.user == request.user %}
-                  <a href="{% url 'posts:delete_comment' post.id comment.id %}"><button class="btn btn-danger ml-auto" style="padding:0px">X</button></a>
-                {% endif %}
-              </div>
-              {% empty %}
+      {% for post in posts %}
+        <div class="card col-md-5 mr-2 mt-3 mr-auto mb-2" style="width: 50rem;">
+          <div>
+            <a href="{% url 'people' post.user%}" style="color: inherit;"><span><h5 class="card-header">{{post.user}}</h5></span></a>
+          </div>
+          <img src="{{post.image.url}}" class="card-img-top mt-2" alt="...">
+          <div class="card-body">
+            <p class="card-text">{{post.content}}</p>
+            {% if post.user == request.user %}
               <div>
-              댓글이 없습니다
+                <form class="d-inline-block" action="{% url 'posts:delete' post.id %}" method="POST">
+                  {% csrf_token %}
+                  <button class="btn btn-danger">삭제</button>
+                </form>
+                <a href="{% url 'posts:update' post.id %}"><button class="btn btn-warning">수정</button></a>
               </div>
-            {% endfor %}
+            <!--작성자만 수정/삭제 가능--> 
+            {% endif %}
+          </div>
+          <div class="card-body" style="padding:10px">
+          <!--좋아요 버튼 추가-->
+            <a href="{% url 'posts:like' post.id %}">
+            <!--해당 유저가 like를 했으면-->
+            {% if user in post.like_users.all %}
+              <i class="fas fa-heart"></i>
+            {% else %}
+              <i class="far fa-heart"></i>
+            {% endif %}
+            </a>
+            <p class="card-text">
+              {{post.like_users.count}}명이 좋아합니다.
+            </p>
+          </div>
+          
+          <div class="card-body" style="padding:10px">
+            <!--Comment에 대한 ModelForm-->
+            {% load bootstrap4 %}
+            <form method="POST" action="{%url 'posts:comment' post.id %}">
+              <!--모델 폼-->
+              {% csrf_token %}
+              {% bootstrap_form form %}
+              <button type="submit" class="btn btn-primary">댓글쓰기</button>
+            </form>
+            
+            <!--해당 글에 작성된 댓글을 모두 출력-->
+            <div class="div mt-3">
+              {% for comment in post.comment_set.all %}
+                <div class="card-text">
+                  <strong>{{comment.user.username}}</strong> {{comment.content}}
+                  {% if comment.user == request.user %}
+                    <a href="{% url 'posts:delete_comment' post.id comment.id %}"><button class="btn btn-danger ml-auto" style="padding:0px">X</button></a>
+                  {% endif %}
+                </div>
+                {% empty %}
+                <div>
+                댓글이 없습니다
+                </div>
+              {% endfor %}
+            </div>
           </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
   </div>
 {% endblock %}
