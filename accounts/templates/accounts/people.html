@@ -3,16 +3,15 @@
 {% block body %}
 
   <div class="container">
-    <h1>{{people.username}} {% if people.username == 'haewon' %}<i class="fas fa-check-circle" style="color:#0946ae;"></i> {% endif %}
+    <h1>{{people.username}} {% if people.username == 'haewon' %}<i class="fas fa-check-circle fa-xs" style="color:#0946ae; width=50;"></i> {% endif %}
     {% if people != request.user %}
       {% if people in user.followings.all %}
-      <a class="btn btn-primary" href="{% url 'accounts:follow' people.id %}">unfollow </a>
+      <a class="btn btn-outline-primary" href="{% url 'accounts:follow' people.id %}">unfollow </a>
       {% else %}
       <a class="btn btn-primary" href="{% url 'accounts:follow' people.id %}">follow </a>
       {% endif %}
     {% endif %}
     </h1>
-    
     <p><strong>{{people.last_name}} {{people.first_name}} </strong></p>
     <p>nickname: {{people.profile.nickname}}</p>
     <p>bio: {{people.profile.description}}</p>
@@ -64,7 +63,14 @@
         </div>
         
         <div class="card-body" style="padding:10px">
-          
+          <!--Comment에 대한 ModelForm-->
+            {% load bootstrap4 %}
+            <form method="POST" action="{%url 'posts:comment' post.id %}">
+              <!--모델 폼-->
+              {% csrf_token %}
+              {% bootstrap_form form %}
+              <button type="submit" class="btn btn-primary">댓글쓰기</button>
+            </form>
           <!--해당 글에 작성된 댓글을 모두 출력-->
           <div class="div mt-3">
             {% for comment in post.comment_set.all %}

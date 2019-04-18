@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from .forms import CustomUserChangeForm, ProfileForm, CustomUserCreationForm
 from .models import Profile
+from posts.forms import CommentForm
 
 # Create your views here.
 # users/login 에 들어왔을 때
@@ -50,17 +51,18 @@ def people(request, username):
     # 1. settings.AUTH_USER_MODEL (django.conf에 있음)
     # 2. get_user_model() : 얘는 아예 객체를 return
     # 3. User (django.contrib.auth.models에 있는 친구) : 얘는 쓰면 안 좋음
-    return render(request, 'accounts/people.html', {'people': people })
+    form = CommentForm()
+    return render(request, 'accounts/people.html', {'people': people , 'form':form})
 
 # 회원 정보 변경 action (편집 & 반영)
 @login_required
 def update(request):
     if request.method == "POST":
-        user_change_form = CustomUserChangeForm(data = request.POST, instance=request.user.profile)
+        user_change_form = CustomUserChangeForm(data = request.POST, instance=request.user)
         profile_form = ProfileForm(data = request.POST, instance = request.user.profile)
         
         if user_change_form.is_valid() and profile_form.is_valid():
-            user_change_form.save() # save()는 그 객체를 반환한다.
+            user = user_change_form.save() # save()는 그 객체를 반환한다.
             profile_form.save()
         return redirect('people', request.user.username)
     else:
@@ -98,10 +100,11 @@ def password(request):
 @login_required
 def follow(request, user_id):
     toFollow = get_object_or_404(get_user_model(), pk=user_id)
-    if request.user in toFollow.followers.all():
-        toFollow.followers.remove(request.user)
-    else:
-        toFollow.followers.add(request.user)
+    if request.user != toFollow:
+        if request.user in toFollow.followers.all():
+            toFollow.followers.remove(request.user)
+        else:
+            toFollow.followers.add(request.user)
 
     return redirect('people', toFollow.username)
 
