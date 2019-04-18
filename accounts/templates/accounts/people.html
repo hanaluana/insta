@@ -3,33 +3,49 @@
 {% block body %}
 
   <div class="container">
-    <h1>{{people.username}} {% if people.username == 'haewon' %}<i class="fas fa-check-circle fa-xs" style="color:#0946ae; width=50;"></i> {% endif %}
-    {% if people != request.user %}
-      {% if people in user.followings.all %}
-      <a class="btn btn-outline-primary" href="{% url 'accounts:follow' people.id %}">unfollow </a>
+    <div class="row mt-3 mb-3">
+    
+      {% if people.profile.image %}
+      <div class="col-md-4 " align="center">
+          <img src="{{people.profile.image.url}}" style="border-radius: 50%; width:270px; height:270px " alt="...">
+      </div>
       {% else %}
-      <a class="btn btn-primary" href="{% url 'accounts:follow' people.id %}">follow </a>
+      <div class="col-md-4 " align="center">
+          <img src="https://t3.ftcdn.net/jpg/00/64/67/80/240_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg" style="border-radius: 50%; width:270px; height:270px " alt="...">
+      </div>
       {% endif %}
-    {% endif %}
-    </h1>
-    <p><strong>{{people.last_name}} {{people.first_name}} </strong></p>
-    <p>nickname: {{people.profile.nickname}}</p>
-    <p>bio: {{people.profile.description}}</p>
-    <div>
-    <a class="btn btn-light" style="border: 1px solid;" href="{% url 'accounts:followers' people.id %}"> {{people.followers.count}} Followers</a>
-    <a class="btn btn-light" style="border: 1px solid;" href="{% url 'accounts:followings' people.id %}">{{people.followings.count}} Followings</a>
+    
+      <div class="col-md-5 mr-auto">
+        <h1>{{people.username}} {% if people.username == 'haewon' %}<i class="fas fa-check-circle fa-xs" style="color:#0946ae; width=50;"></i> {% endif %}
+        {% if people != request.user %}
+          {% if people in user.followings.all %}
+          <a class="btn btn-outline-primary" href="{% url 'accounts:follow' people.id %}">unfollow </a>
+          {% else %}
+          <a class="btn btn-primary" href="{% url 'accounts:follow' people.id %}">follow </a>
+          {% endif %}
+        {% endif %}
+        </h1>
+        <p><strong>{{people.last_name}} {{people.first_name}} </strong></p>
+        <p>nickname: {{people.profile.nickname}}</p>
+        <p>bio: {{people.profile.description}}</p>
+        <div>
+        <a class="btn btn-light" style="border: 1px solid;" href="{% url 'accounts:followers' people.id %}"> {{people.followers.count}} Followers</a>
+        <a class="btn btn-light" style="border: 1px solid;" href="{% url 'accounts:followings' people.id %}">{{people.followings.count}} Followings</a>
+        
+        {% if user.username == people.username %}
+          <div class="mt-2">
+          <a class="btn btn-warning" href="{% url 'accounts:password' %}">비밀번호 변경</a>
+          <a class="btn btn-info" href="{% url 'accounts:update' %}">회원 정보 수정</a>
+          <a class="btn btn-danger" href="{% url 'accounts:delete' %}">회원탈퇴</a>
+          </div>
+        {% endif %}
+        </div>
+      </div>
     </div>
     
-    {% if user.username == people.username %}
-    <div class="mt-1">
-    <a class="btn btn-warning" href="{% url 'accounts:password' %}">비밀번호 변경</a>
-    <a class="btn btn-info" href="{% url 'accounts:update' %}">회원 정보 수정</a>
-    <a class="btn btn-danger" href="{% url 'accounts:delete' %}">회원탈퇴</a>
-    </div>
-    {% endif %}
     <div class="row">
       {% for post in people.post_set.all %}
-      <div class="card col-md-5 mr-2 mt-3 mb-2" style="width: 50rem;">
+      <div class="card col-md-5 mr-2 mt-3 mb-3" style="width: 50rem;">
         <div>
           <span><h5 class="card-header">{{post.user.username}}</h5></span>
         </div>

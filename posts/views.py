@@ -45,9 +45,6 @@ def delete_comment(request, post_id, comment_id):
 def list(request):
     form = CommentForm()
     posts = Post.objects.filter(Q(user_id__in=request.user.followings.all()) | Q(user_id=request.user))
-    print(posts.query)
-    # posts = Post.objects.filter(user_id__in=request.user.followings.all())
-    # posts.extends(request.user.post_set.all())
     return render(request, 'posts/list.html', {'form':form, 'posts':posts})
 
 @require_POST
